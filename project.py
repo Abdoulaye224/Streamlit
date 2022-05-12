@@ -87,13 +87,54 @@ elif choix=="Cours boursiers":
         else:
             st.write("Chargement...")
 
-    ###### Calcul de rentabilité journalière
-    df.rename(columns = {'Adj Close':'AdjClose'}, inplace = True)
+###### Calcul de rentabilité journalière
+#df.rename(columns = {'Adj Close':'AdjClose'}, inplace = True)
 
-    rents = (df.AdjClose[1:].values - df.AdjClose[:-1].values)/df.AdjClose[1:].values
-    rents = pd.Series(rents, index=df.index[1:])
+#rents = (df.AdjClose[1:].values - df.AdjClose[:-1].values)/df.AdjClose[1:].values
+#rents = pd.Series(rents, index=df.index[1:])
 
-    st.write(rents)
+#importation du fichier excel
+
+elif choix=="indicateurs clés":
+    
+    data = pd.read_excel(
+        io="./projet_streamlit.xlsx",
+        engine="openpyxl",
+        sheet_name="ENGIY",
+        skiprows=0,
+        usecols="A:K",
+        nrows=62,
+    )
+
+    data.rename(columns = {'Rentabilité mensuel':'rent_month', 'rentabilité moyenne annuel':'means_rent_year', "Volatilité annuel de l'action":'volatility'}, inplace = True)
+    data['Date'] = data['Date'].apply(lambda x: x.strftime('%Y-%m-%d')) 
+    
+    date_df = data.select_dtypes(['datetime64[ns]'])
+    date_cols = data['Date']
+
+    date_selection = st.sidebar.multiselect(label="Choix date", options=date_cols)
+
+
+
+
+
+    data_renta_mens = data[['Date','rent_month']].dropna()
+    data_renta_moy_an = data[['Date','means_rent_year']].dropna()
+    Volatilite=data[['Date','volatility']].dropna()
+    Dividends=data[['Date', 'Dividends']].dropna()
+    
+
+   #col1 = st.columns(1)
+
+    #col1.metric("rentabilité mensuelle", data_renta_mens['rent_month'][1], "1.2 °F")
+    #col2.metric("rentabilité moyennne annuelle", data_renta_moy_an['means_rent_year'][2], "-8%")
+    #col3.metric("Volatilité", Volatilite['volatility'][1], "4%")
+
+    st.write(data_renta_moy_an)
+
+
+
+
 
 
 
