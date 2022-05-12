@@ -16,13 +16,28 @@ from PIL import Image
 #***********************************************************************************
 
 
-st.title("Tableau de bord de suivi d'actif ")
-st.markdown('Pour la période de **mai 2017** à **mai 2022**.')
+#st.title("Tableau de bord de suivi d'actif ")
+#st.markdown('Pour la période de **mai 2017** à **mai 2022**.')
 
 pages=["Accueil", "Cours boursiers", "indicateurs clés", "Dividende"]
 choix=st.sidebar.selectbox("Menu", pages)
 
 image = Image.open('home.PNG')
+
+
+#************************************************************************************
+data = pd.read_excel(
+        io="./projet_streamlit.xlsx",
+        engine="openpyxl",
+        sheet_name="ENGIY",
+        skiprows=0,
+        usecols="A:K",
+        nrows=62,
+    )
+
+data.rename(columns = {'Rentabilité mensuel':'rent_month', 'rentabilité moyenne annuel':'means_rent_year', "Volatilité annuel de l'action":'volatility'}, inplace = True)
+data['Date'] = data['Date'].apply(lambda x: x.strftime('%Y-%m-%d')) 
+#************************************************************************************
 
 #************************** Fonction pour charger la donnée **************************
 
@@ -42,10 +57,13 @@ def load_data():
 df, numeric_cols, text_cols = load_data()
 #*************************************************************************************
 if choix=="Accueil":
-    st.markdown("<h1 style='text-align: left; color: cadetblue;'>ACCUEIL</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: left; color: cadetblue; margin-top:-60px'>ACCUEIL</h1>", unsafe_allow_html=True)
+    st.title("Tableau de bord de suivi d'actif ")
+    st.markdown('Pour la période de **mai 2017** à **mai 2022**.') 
     st.image(image)
 
 elif choix=="Cours boursiers":
+    st.markdown("<h1 style='text-align: left; color: cadetblue; margin-top:-50px'>Cours boursiers</h1>", unsafe_allow_html=True)
 
     hide_data = st.sidebar.checkbox(label="Afficher les données ")
 
@@ -54,7 +72,7 @@ elif choix=="Cours boursiers":
 
     st.sidebar.title("Paramètres")
 
-    feature_selection = st.sidebar.multiselect(label="Choix", options=numeric_cols)
+    feature_selection = st.sidebar.multiselect(label="Choix de la valeur", options=numeric_cols)
 
     df_features = df[feature_selection]
 
@@ -96,26 +114,13 @@ elif choix=="Cours boursiers":
 #importation du fichier excel
 
 elif choix=="indicateurs clés":
-    
-    data = pd.read_excel(
-        io="./projet_streamlit.xlsx",
-        engine="openpyxl",
-        sheet_name="ENGIY",
-        skiprows=0,
-        usecols="A:K",
-        nrows=62,
-    )
+    st.markdown("<h1 style='text-align: left; color: cadetblue;'>Indicateurs clés</h1>", unsafe_allow_html=True)
 
-    data.rename(columns = {'Rentabilité mensuel':'rent_month', 'rentabilité moyenne annuel':'means_rent_year', "Volatilité annuel de l'action":'volatility'}, inplace = True)
-    data['Date'] = data['Date'].apply(lambda x: x.strftime('%Y-%m-%d')) 
-    
-    date_df = data.select_dtypes(['datetime64[ns]'])
     date_cols = data['Date']
 
-    date_selection = st.sidebar.multiselect(label="Choix date", options=date_cols)
+    date_selection=st.sidebar.selectbox("Choix date", date_cols)
 
-
-
+    #date_selection = st.sidebar.select(label="Choix date", options=date_cols)
 
 
     data_renta_mens = data[['Date','rent_month']].dropna()
@@ -123,6 +128,36 @@ elif choix=="indicateurs clés":
     Volatilite=data[['Date','volatility']].dropna()
     Dividends=data[['Date', 'Dividends']].dropna()
     
+    date_month_cols = data_renta_mens['Date']
+    date_year_cols = data_renta_moy_an['Date']
+
+
+    
+    #date_year_selection=st.sidebar.selectbox("Choix date year", date_year_cols)
+
+    value=data[data['Date']==date_selection]
+    #rent_year=data_renta_moy_an[data_renta_moy_an['Date']==date_year_selection]
+    #vol=Volatilite[Volatilite['Date']==date_selection]
+
+    #print('rent_year', rent_year['means_rent_year'])
+
+    print(value['means_rent_year'].isna())
+
+    if value['means_rent_year'].empty and value['volatility'].empty:
+        col1, col2, col3 = st.columns(3)    
+        col1.metric("Rentabilité mensuel", value=value['rent_month'], delta_color="inverse")
+        col2.metric("rentabilité moyenne annuel", value="mauvaise date...")
+        col3.metric("Volatilité annuel de l'action", 'mauvaise date...')
+    else:
+        col1, col2, col3 = st.columns(3)    
+        col1.metric("Rentabilité mensuel", value['rent_month'])
+        col2.metric("rentabilité moyenne annuel", value['means_rent_year'])
+        col3.metric("Volatilité annuel de l'action", value['volatility'])
+
+    #st.metric(label="rentabilité mensuelle", value=rent_month['rent_month'], delta="1.2 °F")
+
+    print(date_selection)
+    #print(data[data['Date']==date_selection])
 
    #col1 = st.columns(1)
 
@@ -130,9 +165,19 @@ elif choix=="indicateurs clés":
     #col2.metric("rentabilité moyennne annuelle", data_renta_moy_an['means_rent_year'][2], "-8%")
     #col3.metric("Volatilité", Volatilite['volatility'][1], "4%")
 
-    st.write(data_renta_moy_an)
+elif choix=="Dividende":
+    st.markdown("<h1 style='text-align: left; color: cadetblue;'>Dividende</h1>", unsafe_allow_html=True)
+
+    Dividends=data[['Date', 'Dividends']].dropna()
+    div = Dividends['Date']
+    date_selection=st.sidebar.selectbox("Choix date", div)
 
 
+    value=Dividends[Dividends['Date']==date_selection]
+
+
+
+    st.metric(label=f"Diviende versée à la date du {date_selection}", value=value['Dividends'])
 
 
 
