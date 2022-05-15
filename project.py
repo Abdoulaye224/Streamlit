@@ -15,14 +15,27 @@ from PIL import Image
 
 #***********************************************************************************
 
+#Fonction pour des animations 
+import json
+import requests  # pip install requests
+from streamlit_lottie import st_lottie 
 
-#st.title("Tableau de bord de suivi d'actif ")
-#st.markdown('Pour la période de **mai 2017** à **mai 2022**.')
+def lottie_url(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+#chargement d'une animation 
+lottie_chargement = lottie_url("https://assets4.lottiefiles.com/packages/lf20_w51pcehl.json")
+lottie_acceuil = lottie_url("https://assets8.lottiefiles.com/packages/lf20_i2eyukor.json")
+lotti_inprogress = lottie_url("https://assets7.lottiefiles.com/packages/lf20_earcnwm3.json")
+
+#************************************************************************************
 
 pages=["Accueil", "Cours boursiers", "indicateurs clés", "Dividende"]
 choix=st.sidebar.selectbox("Menu", pages)
 
-image = Image.open('home.PNG')
 
 
 #************************************************************************************
@@ -59,9 +72,12 @@ df, numeric_cols, text_cols = load_data()
 if choix=="Accueil":
     st.markdown("<h1 style='text-align: left; color: cadetblue; margin-top:-60px'>ACCUEIL</h1>", unsafe_allow_html=True)
     st.title("Tableau de bord de suivi d'actif ")
-    st.markdown('Pour la période de **mai 2017** à **mai 2022**.') 
-    st.image(image)
-
+    st.markdown('Pour la période de **mai 2017** à **mai 2022**.')
+    st_lottie(lottie_acceuil,speed=1,reverse=False,loop=True,quality="low",height=None,width=None,key=None)
+    st.markdown('PARTIE 1 : ')
+    st.markdown('Dans la première partie vous aurez l\'occasion de voir le jeu de données globale pour la période précisée et l\évolution chronologique des différents paramètres')
+    st.markdown('PARTIE 2 : ')
+    st.markdown('Vous verrez un ensemble d\indicateurs utiles à la prise de décision')
 elif choix=="Cours boursiers":
     st.markdown("<h1 style='text-align: left; color: cadetblue; margin-top:-50px'>Cours boursiers</h1>", unsafe_allow_html=True)
 
@@ -103,24 +119,13 @@ elif choix=="Cours boursiers":
             tickerDf = tickerData.history(period='id', start=a_date[0].strftime("%Y-%m-%d"), end=a_date[1].strftime("%Y-%m-%d"))
             st.line_chart(tickerDf.Volume)
         else:
-            st.write("Chargement...")
-
-###### Calcul de rentabilité journalière
-#df.rename(columns = {'Adj Close':'AdjClose'}, inplace = True)
-
-#rents = (df.AdjClose[1:].values - df.AdjClose[:-1].values)/df.AdjClose[1:].values
-#rents = pd.Series(rents, index=df.index[1:])
-
-#importation du fichier excel
-
+            st_lottie(lotti_inprogress,speed=1,reverse=False,loop=True,quality="low",height=200,width=200,key=None,)
 elif choix=="indicateurs clés":
     st.markdown("<h1 style='text-align: left; color: cadetblue;'>Indicateurs clés</h1>", unsafe_allow_html=True)
 
     date_cols = data['Date']
 
     date_selection=st.sidebar.selectbox("Choix date", date_cols)
-
-    #date_selection = st.sidebar.select(label="Choix date", options=date_cols)
 
 
     data_renta_mens = data[['Date','rent_month']].dropna()
@@ -131,17 +136,7 @@ elif choix=="indicateurs clés":
     date_month_cols = data_renta_mens['Date']
     date_year_cols = data_renta_moy_an['Date']
 
-
-    
-    #date_year_selection=st.sidebar.selectbox("Choix date year", date_year_cols)
-
     value=data[data['Date']==date_selection]
-    #rent_year=data_renta_moy_an[data_renta_moy_an['Date']==date_year_selection]
-    #vol=Volatilite[Volatilite['Date']==date_selection]
-
-    #print('rent_year', rent_year['means_rent_year'])
-
-    print(value['means_rent_year'].isna())
 
     if value['means_rent_year'].empty and value['volatility'].empty:
         col1, col2, col3 = st.columns(3)    
@@ -153,17 +148,6 @@ elif choix=="indicateurs clés":
         col1.metric("Rentabilité mensuel", value['rent_month'])
         col2.metric("rentabilité moyenne annuel", value['means_rent_year'])
         col3.metric("Volatilité annuel de l'action", value['volatility'])
-
-    #st.metric(label="rentabilité mensuelle", value=rent_month['rent_month'], delta="1.2 °F")
-
-    print(date_selection)
-    #print(data[data['Date']==date_selection])
-
-   #col1 = st.columns(1)
-
-    #col1.metric("rentabilité mensuelle", data_renta_mens['rent_month'][1], "1.2 °F")
-    #col2.metric("rentabilité moyennne annuelle", data_renta_moy_an['means_rent_year'][2], "-8%")
-    #col3.metric("Volatilité", Volatilite['volatility'][1], "4%")
 
 elif choix=="Dividende":
     st.markdown("<h1 style='text-align: left; color: cadetblue;'>Dividende</h1>", unsafe_allow_html=True)
