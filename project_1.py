@@ -29,6 +29,7 @@ def lottie_url(url: str):
 #chargement d'une animation 
 lottie_chargement = lottie_url("https://assets4.lottiefiles.com/packages/lf20_w51pcehl.json")
 lottie_acceuil = lottie_url("https://assets8.lottiefiles.com/packages/lf20_i2eyukor.json")
+lotti_inprogress = lottie_url("https://assets7.lottiefiles.com/packages/lf20_earcnwm3.json")
 
 #************************************************************************************
 #st.title("Tableau de bord de suivi d'actif ")
@@ -37,7 +38,7 @@ lottie_acceuil = lottie_url("https://assets8.lottiefiles.com/packages/lf20_i2eyu
 pages=["Accueil", "Cours boursiers", "indicateurs clés", "Dividende"]
 choix=st.sidebar.selectbox("Menu", pages)
 
-image = Image.open('home.PNG')
+image = Image.open('engie.PNG')
 
 
 #************************************************************************************
@@ -75,9 +76,11 @@ if choix=="Accueil":
     st.markdown("<h1 style='text-align: left; color: cadetblue; margin-top:-60px'>ACCUEIL</h1>", unsafe_allow_html=True)
     st.title("Tableau de bord de suivi d'actif ")
     st.markdown('Pour la période de **mai 2017** à **mai 2022**.')
-    st_lottie(lottie_acceuil,speed=1,reverse=False,loop=True,quality="low",height=None,width=None,key=None,) 
-    st.image(image)
-
+    st_lottie(lottie_acceuil,speed=1,reverse=False,loop=True,quality="low",height=None,width=None,key=None)
+    st.markdown('PARTIE 1 : ')
+    st.markdown('Dans la première partie vous aurez l\'occasion de voir le jeu de données globale pour la période précisée et l\évolution chronologique des différents paramètres')
+    st.markdown('PARTIE 2 : ')
+    st.markdown('Vous verrez un ensemble d\indicateurs utiles à la prise de décision')
 elif choix=="Cours boursiers":
     st.markdown("<h1 style='text-align: left; color: cadetblue; margin-top:-50px'>Cours boursiers</h1>", unsafe_allow_html=True)
 
@@ -119,8 +122,7 @@ elif choix=="Cours boursiers":
             tickerDf = tickerData.history(period='id', start=a_date[0].strftime("%Y-%m-%d"), end=a_date[1].strftime("%Y-%m-%d"))
             st.line_chart(tickerDf.Volume)
         else:
-            st_lottie(lottie_chargement,speed=1,reverse=False,loop=True,quality="low",height=None,width=None,key=None,)
-#st.write(chargement...)
+            st_lottie(lotti_inprogress,speed=1,reverse=False,loop=True,quality="low",height=200,width=200,key=None,)
 
 ###### Calcul de rentabilité journalière
 #df.rename(columns = {'Adj Close':'AdjClose'}, inplace = True)
