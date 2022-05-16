@@ -10,7 +10,6 @@ import plotly.express as px
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
-from PIL import Image
 
 #***********************************************************************************
 
