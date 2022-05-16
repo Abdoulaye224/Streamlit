@@ -1,3 +1,6 @@
-Requirement already satisfied: plotly in c:\users\traor\anaconda3\lib\site-packages (5.7.0)
-Requirement already satisfied: six in c:\users\traor\anaconda3\lib\site-packages (from plotly) (1.15.0)
-Requirement already satisfied: tenacity>=6.2.0 in c:\users\traor\anaconda3\lib\site-packages (from plotly) (8.0.1)
+streamlit==0.80.0
+pandas==1.0.5
+numpy==1.18.5
+plotly==4.14.3
+plotly-express==0.4.0
+xlrd==1.2.0
