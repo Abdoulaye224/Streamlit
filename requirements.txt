@@ -5,3 +5,4 @@ plotly==5.8.0
 plotly-express==0.4.1
 matplotlib==3.5.2
 yfinance==0.1.70
+streamlit-lottie==0.0.3
