@@ -20,6 +20,17 @@ import json
 import requests  # pip install requests
 from streamlit_lottie import st_lottie 
 
+#****************************Style**************************
+st.markdown("""
+<style>
+.paragraphe {
+    font-size:20px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+#************************************************************
+
+
 def lottie_url(url: str):
     r = requests.get(url)
     if r.status_code != 200:
@@ -74,14 +85,21 @@ if choix=="Accueil":
     st.title("Tableau de bord de suivi d'actif ")
     st.markdown('Pour la période de **mai 2017** à **mai 2022**.')
     st_lottie(lottie_acceuil,speed=1,reverse=False,loop=True,quality="low",height=None,width=None,key=None)
-    st.markdown('PARTIE 1 : ')
-    st.markdown('Dans la première partie vous aurez l\'occasion de voir le jeu de données globale pour la période précisée et l\évolution chronologique des différents paramètres')
-    st.markdown('PARTIE 2 : ')
-    st.markdown('Vous verrez un ensemble d\indicateurs utiles à la prise de décision')
+    st.markdown("<p class='paragraphe'> Bienvenue sur notre tableaud de bord qui a pour objection de suivre l'historique de l'action de la société ENGIE sur la période de mai 2017 à mai 2022 </p>", unsafe_allow_html=True)
+    st.markdown('## PARTIE 1 : ')
+    st.markdown("<p class='paragraphe'> Dans la première partie vous aurez l'occasion de voir le jeu de données globale pour la période précisée et l'évolution chronologique des différents paramètres </p>", unsafe_allow_html=True)
+    st.markdown('## PARTIE 2 : ')
+    st.markdown("<p class='paragraphe'> Cette partie consiste à avoir une vue sur l'historique des différentes données high, value, close... de l'entreprise. Vous verrez l'évolution de ces valeurs selon la période </p>", unsafe_allow_html=True)
+    st.markdown('## PARTIE 3 : ')
+    st.markdown("<p class='paragraphe'> Cette troisième partie permet de faire un Zoom sur certains indicateurs clés tels que la rentabilité annuelle/mensuelle, la volatilité </p>", unsafe_allow_html=True)
+    st.markdown('## PARTIE 4 : ')
+    st.markdown("<p class='paragraphe'> La quatrième partie vous permettra de voir pendant quelle période l'entreprise engie a versé des dividendes à ses actionnaires ainsi que les valeurs associées </p>", unsafe_allow_html=True)
+
 elif choix=="Cours boursiers":
     st.markdown("<h1 style='text-align: left; color: cadetblue; margin-top:-50px'>Cours boursiers</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='paragraphe'> Sur cette page, vous pourrez afficher les données si vous le souhaitez, vous avez aussi la possibilité d'afficher pour chaque colonne l'évolution (vous pourrez combiner plusieurs colonnes également) </p>", unsafe_allow_html=True)
 
-    hide_data = st.sidebar.checkbox(label="Afficher les données ")
+    hide_data = st.checkbox(label="Afficher les données ")
 
     if hide_data:
         st.write(df)
@@ -92,11 +110,15 @@ elif choix=="Cours boursiers":
 
     df_features = df[feature_selection]
 
+    print('taille', len(feature_selection))
 
     plotly_figure = px.line(data_frame=df_features, x=df_features.index, y=feature_selection, title="Chronologie")
-
-    st.plotly_chart(plotly_figure) 
-
+        
+    if len(feature_selection) == 0:
+        st_lottie(lotti_inprogress,speed=1,reverse=False,loop=True,quality="low",height=200,width=200,key=None)
+        st.info('Veuillez selectionner la(es) donnée(s) à afficher dans les paramètres ! ')
+    else:
+        st.plotly_chart(plotly_figure) 
 
 
     hide_volum = st.sidebar.checkbox(label="Afficher les volume selon une période ")
@@ -122,9 +144,13 @@ elif choix=="Cours boursiers":
             st_lottie(lotti_inprogress,speed=1,reverse=False,loop=True,quality="low",height=200,width=200,key=None,)
 elif choix=="indicateurs clés":
     st.markdown("<h1 style='text-align: left; color: cadetblue;'>Indicateurs clés</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='paragraphe'> Cette page met en évidence certains indicateurs clés que vous pouvez visualiser en changeant de dates dans l'onglet des paramètres </p>", unsafe_allow_html=True)
+    st.info("Les indicateurs 'rentabilité moyenne' et 'volatilité annuelle' ne sont pas possibles à afficher pour toutes les dates possibles. Faudra dans ce cas choisir le premier jour de chaque années pour avoir ces chiffres ou la dernière date présente")
+
 
     date_cols = data['Date']
 
+    st.sidebar.title("Paramètres")
     date_selection=st.sidebar.selectbox("Choix date", date_cols)
 
 
@@ -151,16 +177,14 @@ elif choix=="indicateurs clés":
 
 elif choix=="Dividende":
     st.markdown("<h1 style='text-align: left; color: cadetblue;'>Dividende</h1>", unsafe_allow_html=True)
-
+    st.info("Cette page vous montre l'ensemble des dividendes versées par action par la société durant les 5 dernières années")
     Dividends=data[['Date', 'Dividends']].dropna()
     div = Dividends['Date']
     date_selection=st.sidebar.selectbox("Choix date", div)
 
-
     value=Dividends[Dividends['Date']==date_selection]
 
-
-
+    st.markdown("<p class='paragraphe'> Chiffre en € par action <p>", unsafe_allow_html=True)
     st.metric(label=f"Diviende versée à la date du {date_selection}", value=value['Dividends'])
 
 
