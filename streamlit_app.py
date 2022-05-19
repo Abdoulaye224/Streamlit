@@ -83,7 +83,7 @@ if choix=="Accueil":
     st.title("Tableau de bord de suivi d'actif ")
     st.markdown('Pour la période de **mai 2017** à **mai 2022**.')
     st_lottie(lottie_acceuil,speed=1,reverse=False,loop=True,quality="low",height=None,width=None,key=None)
-    st.markdown("<p class='paragraphe'> Bienvenue sur notre tableaud de bord qui a pour objection de suivre l'historique de l'action de la société ENGIE sur la période de mai 2017 à mai 2022 </p>", unsafe_allow_html=True)
+    st.markdown("<p class='paragraphe'> Bienvenue sur notre tableau de bord qui a pour objection de suivre l'historique de l'action de la société ENGIE sur la période de mai 2017 à mai 2022 </p>", unsafe_allow_html=True)
     st.markdown('## PARTIE 1 : ')
     st.markdown("<p class='paragraphe'> Dans la première partie vous aurez l'occasion de voir le jeu de données globale pour la période précisée et l'évolution chronologique des différents paramètres </p>", unsafe_allow_html=True)
     st.markdown('## PARTIE 2 : ')
@@ -113,7 +113,6 @@ elif choix=="Cours boursiers":
     plotly_figure = px.line(data_frame=df_features, x=df_features.index, y=feature_selection, title="Chronologie")
         
     if len(feature_selection) == 0:
-        st_lottie(lotti_inprogress,speed=1,reverse=False,loop=True,quality="low",height=200,width=200,key=None)
         st.info('Veuillez selectionner la(es) donnée(s) à afficher dans les paramètres ! ')
     else:
         st.plotly_chart(plotly_figure) 
