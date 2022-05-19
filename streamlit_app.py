@@ -136,7 +136,7 @@ elif choix=="Cours boursiers":
         if len(a_date) == 2:
             start_date = a_date[0].strftime("%Y-%m-%d")
             end_date = a_date[1].strftime("%Y-%m-%d")
-            tickerDf = tickerData.history(period='id', start=a_date[0].strftime("%Y-%m-%d"), end=a_date[1].strftime("%Y-%m-%d"))
+            tickerDf = tickerData.history(period='id', start=start_date, end=end_date)
             st.line_chart(tickerDf.Volume)
         else:
             st_lottie(lotti_inprogress,speed=1,reverse=False,loop=True,quality="low",height=200,width=200,key=None,)
