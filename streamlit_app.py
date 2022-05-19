@@ -18,15 +18,20 @@ import json
 import requests  # pip install requests
 from streamlit_lottie import st_lottie 
 
-#****************************Style**************************
+#**************************** S T Y L E ******************************************************
+
 st.markdown("""
 <style>
 .paragraphe {
     font-size:20px !important;
 }
+.span{
+    color: cadetblue
+}
 </style>
 """, unsafe_allow_html=True)
-#************************************************************
+
+#*********************************** A N I M A T I O N ****************************************
 
 
 def lottie_url(url: str):
@@ -40,14 +45,12 @@ lottie_chargement = lottie_url("https://assets4.lottiefiles.com/packages/lf20_w5
 lottie_acceuil = lottie_url("https://assets8.lottiefiles.com/packages/lf20_i2eyukor.json")
 lotti_inprogress = lottie_url("https://assets7.lottiefiles.com/packages/lf20_earcnwm3.json")
 
-#************************************************************************************
+#********************************* M E N U ***************************************************
 
 pages=["Accueil", "Cours boursiers", "indicateurs clés", "Dividende"]
 choix=st.sidebar.selectbox("Menu", pages)
 
-
-
-#************************************************************************************
+#**************************** C H A R G E M E N T __ K P I ********************************************************
 data = pd.read_excel(
         io="./projet_streamlit.xlsx",
         engine="openpyxl",
@@ -59,7 +62,6 @@ data = pd.read_excel(
 
 data.rename(columns = {'Rentabilité mensuel':'rent_month', 'rentabilité moyenne annuel':'means_rent_year', "Volatilité annuel de l'action":'volatility'}, inplace = True)
 data['Date'] = data['Date'].apply(lambda x: x.strftime('%Y-%m-%d')) 
-#************************************************************************************
 
 #************************** Fonction pour charger la donnée **************************
 
@@ -77,7 +79,9 @@ def load_data():
     return df, numeric_cols, text_cols
 
 df, numeric_cols, text_cols = load_data()
-#*************************************************************************************
+
+#************************************* M A I N *********************************************
+
 if choix=="Accueil":
     st.markdown("<h1 style='text-align: left; color: cadetblue; margin-top:-60px'>ACCUEIL</h1>", unsafe_allow_html=True)
     st.title("Tableau de bord de suivi d'actif ")
@@ -117,7 +121,6 @@ elif choix=="Cours boursiers":
     else:
         st.plotly_chart(plotly_figure) 
 
-
     hide_volum = st.sidebar.checkbox(label="Afficher les volume selon une période ")
 
     if hide_volum:
@@ -127,7 +130,6 @@ elif choix=="Cours boursiers":
         max_date = datetime.date(2022,4,18)
 
         a_date = st.date_input("Chosir la période", (min_date, max_date))
-
         
         tickerSymbol = 'ENGIY'
         tickerData = yf.Ticker(tickerSymbol)
@@ -143,7 +145,6 @@ elif choix=="indicateurs clés":
     st.markdown("<h1 style='text-align: left; color: cadetblue;'>Indicateurs clés</h1>", unsafe_allow_html=True)
     st.markdown("<p class='paragraphe'> Cette page met en évidence certains indicateurs clés que vous pouvez visualiser en changeant de dates dans l'onglet des paramètres </p>", unsafe_allow_html=True)
     st.info("Les indicateurs 'rentabilité moyenne' et 'volatilité annuelle' ne sont pas possibles à afficher pour toutes les dates possibles. Faudra dans ce cas choisir le premier jour de chaque années pour avoir ces chiffres ou la dernière date présente")
-
 
     date_cols = data['Date']
 
@@ -161,30 +162,20 @@ elif choix=="indicateurs clés":
 
     value=data[data['Date']==date_selection]
 
-    if value['means_rent_year'].empty and value['volatility'].empty:
-        col1, col2, col3 = st.columns(3)    
-        col1.metric("Rentabilité mensuel", value=value['rent_month'], delta_color="inverse")
-        col2.metric("rentabilité moyenne annuel", value="mauvaise date...")
-        col3.metric("Volatilité annuel de l'action", 'mauvaise date...')
-    else:
-        col1, col2, col3 = st.columns(3)    
-        col1.metric("Rentabilité mensuel", value['rent_month'])
-        col2.metric("rentabilité moyenne annuel", value['means_rent_year'])
-        col3.metric("Volatilité annuel de l'action", value['volatility'])
+    col1, col2, col3 = st.columns(3)    
+    col1.metric("Rentabilité mensuel", value['rent_month'])
+    col2.metric("rentabilité moyenne annuel", value['means_rent_year'])
+    col3.metric("Volatilité annuel de l'action", value['volatility'])
 
 elif choix=="Dividende":
     st.markdown("<h1 style='text-align: left; color: cadetblue;'>Dividende</h1>", unsafe_allow_html=True)
     st.info("Cette page vous montre l'ensemble des dividendes versées par action par la société durant les 5 dernières années")
     Dividends=data[['Date', 'Dividends']].dropna()
     div = Dividends['Date']
-    date_selection=st.sidebar.selectbox("Choix date", div)
+    date_selection=st.selectbox("Choix date", div)
 
     value=Dividends[Dividends['Date']==date_selection]
 
-    st.markdown("<p class='paragraphe'> Chiffre en € par action <p>", unsafe_allow_html=True)
-    st.metric(label=f"Diviende versée à la date du {date_selection}", value=value['Dividends'])
-
-
-
-
+    st.markdown(f"<p class='paragraphe'> Dividende versée en € par action à la date du <span class='span'>{date_selection}</span></p>", unsafe_allow_html=True)
+    st.metric(label="", value=value['Dividends'])
 
